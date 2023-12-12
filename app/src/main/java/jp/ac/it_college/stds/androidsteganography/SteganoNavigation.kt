@@ -52,32 +52,33 @@ fun SteganoNavigation(
             modifier = Modifier.padding(it)
         ) {
             composable(Destinations.START) {
-                titleText = "最初の画面"
-                StartScene (
-                    OnEncryptClick = {
+                StartScene(
+                    onEncryptClick = {
                         navController.navigate(Destinations.ENCRYPTION)
                     },
-                    OnDecryptClick = {
+                    onDecryptClick = {
                         navController.navigate(Destinations.DECRYPTION)
                     }
                 )
             }
 
             composable(Destinations.ENCRYPTION) {
-                EncryptScene (
-                    OnEncryptResult = { navController.navigate(Destinations.RESULT_ENC) }
+                EncryptScene(
+                    onEncryptResult = { navController.navigate(Destinations.RESULT_ENC) }
+
                 )
             }
 
             composable(Destinations.RESULT_ENC) {
-                 EncryptResultScene (
-                    OnEndClick = { navController.navigate(Destinations.START) }
+                EncryptResultScene(
+                    onEndClick = { navController.navigate(Destinations.START) }
+
                 )
             }
 
             composable(Destinations.DECRYPTION) {
                 DecodeScene(
-                    OnDecodeClick = { navController.navigate(Destinations.START) }
+                    onDecodeClick = { navController.navigate(Destinations.START) }
                 )
             }
         }
