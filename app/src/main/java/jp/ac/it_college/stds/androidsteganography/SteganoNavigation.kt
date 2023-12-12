@@ -22,7 +22,6 @@ import jp.ac.it_college.stds.androidsteganography.scene.EncryptResultScene
 import jp.ac.it_college.stds.androidsteganography.scene.EncryptScene
 import jp.ac.it_college.stds.androidsteganography.scene.StartScene
 
-
 object Destinations {
     const val START = "start"
     const val ENCRYPTION = "encryption"
@@ -66,12 +65,14 @@ fun SteganoNavigation(
             composable(Destinations.ENCRYPTION) {
                 EncryptScene(
                     onEncryptResult = { navController.navigate(Destinations.RESULT_ENC) }
+
                 )
             }
 
             composable(Destinations.RESULT_ENC) {
                 EncryptResultScene(
                     onEndClick = { navController.navigate(Destinations.START) }
+
                 )
             }
 
@@ -82,4 +83,5 @@ fun SteganoNavigation(
             }
         }
     }
+
 }
