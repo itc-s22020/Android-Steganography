@@ -1,10 +1,20 @@
 package jp.ac.it_college.stds.androidsteganography
 
+import android.graphics.Bitmap
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,54 +42,95 @@ object Destinations {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SteganoNavigation(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
 ) {
     var titleText by remember { mutableStateOf("") }
+    var bm by remember {
+        mutableStateOf(
+            Bitmap.createBitmap(
+                1,
+                1,
+                Bitmap.Config.ARGB_8888
+            )
+        )
+    }
+    var showText by remember { mutableStateOf(false) }
+
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    Scaffold(
-        // 上部のバー
-        topBar = {
-            TopAppBar(title = {
-                Text(text = titleText)
-            })
-        }
+    Surface(
+        modifier = Modifier.fillMaxSize(),
     ) {
-        NavHost(
-            navController = navController,
-            startDestination = Destinations.START,
-            modifier = Modifier.padding(it)
-        ) {
-            composable(Destinations.START) {
-                StartScene(
-                    onEncryptClick = {
-                        navController.navigate(Destinations.ENCRYPTION)
+        Scaffold(
+
+            topBar = {
+                CenterAlignedTopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ),
+                    title = { Text(text = titleText) },
+                    navigationIcon = {
+                        if (titleText != "スタート画面") {
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                            }
+                        }
                     },
-                    onDecryptClick = {
-                        navController.navigate(Destinations.DECRYPTION)
+                    actions = {
+                        IconButton(onClick = { showText = true }) {
+                            Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
+                        }
                     }
                 )
-            }
+            },
+        ) {
+            NavHost(
+                navController = navController,
+                startDestination = Destinations.START,
+                modifier = Modifier.padding(it)
+            ) {
+                composable(Destinations.START) {
+                    titleText = "スタート画面"
+                    StartScene(
+                        onEncryptClick = {
+                            bm = it
+                            navController.navigate(Destinations.ENCRYPTION)
+                        },
+                        onDecryptClick = {
+                            bm = it
+                            navController.navigate(Destinations.DECRYPTION)
+                        }
+                    )
+                }
 
-            composable(Destinations.ENCRYPTION) {
-                EncryptScene(
-                    onEncryptResult = { navController.navigate(Destinations.RESULT_ENC) }
+                composable(Destinations.ENCRYPTION) {
+                    titleText = "暗号化画面"
+                    EncryptScene(
+                        receiveBm = bm,
+                        onEncryptResult = {
+                            bm = it
+                            navController.navigate(Destinations.RESULT_ENC)
+                        }
+                    )
+                }
 
-                )
-            }
+                composable(Destinations.RESULT_ENC) {
+                    titleText = "暗号化結果画面"
+                    EncryptResultScene(
+                        receiveBm = bm,
+                        onEndClick = { navController.navigate(Destinations.START) }
+                    )
+                }
 
-            composable(Destinations.RESULT_ENC) {
-                EncryptResultScene(
-                    onEndClick = { navController.navigate(Destinations.START) }
+                composable(Destinations.DECRYPTION) {
+                    titleText = "復号化画面"
 
-                )
-            }
-
-            composable(Destinations.DECRYPTION) {
-                DecodeScene(
-                    onDecodeClick = { navController.navigate(Destinations.START) }
-                )
+                    DecodeScene(
+                        decReceive = bm,
+                        onDecodeClick = { navController.navigate(Destinations.START) }
+                    )
+                }
             }
         }
     }
