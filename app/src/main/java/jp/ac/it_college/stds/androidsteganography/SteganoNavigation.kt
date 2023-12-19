@@ -45,7 +45,7 @@ fun SteganoNavigation(
     navController: NavHostController = rememberNavController(),
 ) {
     var titleText by remember { mutableStateOf("") }
-    var testBitmap by remember {
+    var bm by remember {
         mutableStateOf(
             Bitmap.createBitmap(
                 1,
@@ -94,11 +94,11 @@ fun SteganoNavigation(
                     titleText = "スタート画面"
                     StartScene(
                         onEncryptClick = {
-                            testBitmap = it
+                            bm = it
                             navController.navigate(Destinations.ENCRYPTION)
                         },
                         onDecryptClick = {
-                            testBitmap = it
+                            bm = it
                             navController.navigate(Destinations.DECRYPTION)
                         }
                     )
@@ -107,9 +107,9 @@ fun SteganoNavigation(
                 composable(Destinations.ENCRYPTION) {
                     titleText = "暗号化画面"
                     EncryptScene(
-                        receive = testBitmap,
+                        receiveBm = bm,
                         onEncryptResult = {
-                            testBitmap = it
+                            bm = it
                             navController.navigate(Destinations.RESULT_ENC)
                         }
                     )
@@ -118,7 +118,7 @@ fun SteganoNavigation(
                 composable(Destinations.RESULT_ENC) {
                     titleText = "暗号化結果画面"
                     EncryptResultScene(
-                        receive2 = testBitmap,
+                        receiveBm = bm,
                         onEndClick = { navController.navigate(Destinations.START) }
                     )
                 }
@@ -127,7 +127,7 @@ fun SteganoNavigation(
                     titleText = "復号化画面"
 
                     DecodeScene(
-                        decReceive = testBitmap,
+                        decReceive = bm,
                         onDecodeClick = { navController.navigate(Destinations.START) }
                     )
                 }
