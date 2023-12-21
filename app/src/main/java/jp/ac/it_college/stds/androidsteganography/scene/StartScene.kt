@@ -26,8 +26,8 @@ import jp.ac.it_college.stds.androidsteganography.ui.theme.AndroidSteganographyT
 import kotlin.math.roundToInt
 
 @Composable
-fun StartScene(modifier: Modifier = Modifier, onEncryptClick: () -> Unit = {}, onDecryptClick: () -> Unit = {})  {
-    var testBitmap by remember { mutableStateOf(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)) }
+fun StartScene(modifier: Modifier = Modifier, onEncryptClick: (Bitmap) -> Unit = {}, onDecryptClick: (Bitmap) -> Unit = {})  {
+    var bm by remember { mutableStateOf(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)) }
     val initialBitmap by remember { mutableStateOf(Bitmap.createBitmap(3500, 2200, Bitmap.Config.ARGB_8888)) }
     Column (
         modifier = Modifier.fillMaxSize(),
@@ -45,16 +45,20 @@ fun StartScene(modifier: Modifier = Modifier, onEncryptClick: () -> Unit = {}, o
                     modifier = Modifier.align(Alignment.Center),
                     initialBitmap = initialBitmap,
                     context = LocalContext.current,
-                    onBitmapChange = {testBitmap = it}
+                    onBitmapChange = {bm = it}
                 )
             }
         }
         
-        Text(text = "保存できる推定容量: ${testBitmap.width*testBitmap.height*3/8} byte", modifier.align(Alignment.CenterHorizontally))
-        Button(onClick = {}, modifier.align(Alignment.CenterHorizontally)) {
+        Text(text = "保存できる推定容量: ${bm.width*bm.height*3/8} byte", modifier.align(Alignment.CenterHorizontally))
+        Button(onClick = {onEncryptClick(bm)},
+            enabled = bm.width + bm.height > 2,
+            modifier = modifier.align(Alignment.CenterHorizontally)) {
             Text("暗号化")
         }
-        Button(onClick = {}, modifier.align(Alignment.CenterHorizontally)) {
+        Button(onClick = { onDecryptClick(bm) },
+            enabled = bm.width + bm.height > 2,
+            modifier = modifier.align(Alignment.CenterHorizontally)) {
             Text("復号化")
         }
 
