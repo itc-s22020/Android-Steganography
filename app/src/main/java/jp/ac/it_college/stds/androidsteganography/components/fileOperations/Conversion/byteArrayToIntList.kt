@@ -1,7 +1,7 @@
-package jp.ac.it_college.stds.androidsteganography.components.fileOperations
+package jp.ac.it_college.stds.androidsteganography.components.fileOperations.Conversion
 
 /*
- * byteArrayをMutableList<Int>に変換する関数
+ * byteArrayをBitSetを経由してMutableList<Int>に変換する関数
  * byteArray : ByteArray? # 変換したいByteArrayを渡す
  */
 fun byteArrayToIntList(
