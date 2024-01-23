@@ -1,4 +1,4 @@
-package jp.ac.it_college.stds.androidsteganography.components.steganography
+package jp.ac.it_college.stds.androidsteganography.components.steganography.colorChanger
 
 
 /*
