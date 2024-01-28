@@ -1,6 +1,10 @@
 package jp.ac.it_college.stds.androidsteganography.scene
 
+import android.content.ContentValues
+import android.content.Context
 import android.graphics.Bitmap
+import android.os.Environment
+import android.provider.MediaStore
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,32 +16,39 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import jp.ac.it_college.stds.androidsteganography.ui.theme.AndroidSteganographyTheme
-import java.nio.ByteBuffer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.toUpperCase
-import java.io.ByteArrayOutputStream
+import jp.ac.it_college.stds.androidsteganography.components.common.readSteganography
+import kotlinx.coroutines.launch
+import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipEntry
-import java.util.zip.ZipOutputStream
-import kotlin.text.StringBuilder
+import java.util.zip.ZipInputStream
+
 
 
 @Composable
 fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, decReceive: Bitmap) {
-    val context = LocalContext.current
 
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var zipBitList: MutableList<Int> = remember { mutableListOf<Int>().toMutableList() }
+    var kara: ByteArray? by remember { mutableStateOf(null) }
+    var fileName: String by remember {
+        mutableStateOf("")
+    }
+
+    println("kara: $kara")
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -56,12 +67,16 @@ fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, d
                 )
             }
         }
-        val bitList = extractHiddenImage(decReceive)
 
-        val byteArrayList = convertListToByteArray(bitList)
-//        println("test : ${restoreFileFromByteArray(byteArrayList, context.filesDir.absolutePath + "/restored_file.zip")}")
-
-        Button(onClick = { TODO() }) {
+        Button(onClick = { kara = decReceive.readSteganography(zipBitList) }) {
+            Text(text = "読み込み")
+        }
+        fileName = "example24.zip"
+        Button(onClick = {
+            scope.launch {
+                saveAndExtractZip(context, kara!!, fileName, "extracted_files")
+            }
+        }) {
             Text(text = "保存")
         }
         Button(onClick = onDecodeClick) {
@@ -71,40 +86,46 @@ fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, d
 }
 
 
-
-fun extractHiddenImage(bitmap: Bitmap): MutableList<Int> {
-    val pixels = IntArray(bitmap.width * bitmap.height)
-    val stegoSoft = bitmap.copy(Bitmap.Config.ARGB_8888, true)
-
-    stegoSoft.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
-    val hiddenData = mutableListOf<Int>()
-
-
-    for (y in 0 until stegoSoft.width) {
-        for (x in 0 until stegoSoft.height) {
-            val pixel = pixels[x + y * bitmap.width]
-
-//            val pixelAlpha = (pixels[x + y * bitmap.width] shr 24) and 1
-            val pixelRed = (pixel shr 16) and 0xff
-            val pixelGreen = (pixel shr 8) and 0xff
-            val pixelBlue = pixel and 0xff
-
-            hiddenData.apply {
-                add(pixelRed % 3)
-                add(pixelGreen % 3)
-                add(pixelBlue % 3)
-            }
+fun saveAndExtractZip(context: Context, byteArray: ByteArray, zipFileName: String, extractToDirName: String) {
+    try {
+        val values = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, zipFileName)
+            put(MediaStore.MediaColumns.MIME_TYPE, "application/zip")
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
         }
-    }
-    return hiddenData
-}
 
-fun convertListToByteArray(list: List<Int>): ByteArray {
-    val byteArray = ByteArray(list.size)
-    for (i in list.indices) {
-        byteArray[i] = list[i].toByte()
+        val resolver = context.contentResolver
+        val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+            ?: throw Exception("ファイル作成に失敗")
+
+        resolver.openOutputStream(uri).use { outputStream ->
+            outputStream?.write(byteArray)
+        }
+
+        val zipInputStream = ZipInputStream(byteArray.inputStream())
+        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val extractDir = File(downloadsDir, extractToDirName)
+
+        var zipEntry: ZipEntry? = zipInputStream.nextEntry
+        while (zipEntry != null) {
+            val file = File(extractDir, zipEntry.name)
+            if (zipEntry.isDirectory) {
+                file.mkdirs()
+            } else {
+                file.parentFile?.mkdirs()
+                FileOutputStream(file).use { fileOutputStream ->
+                    BufferedOutputStream(fileOutputStream).use { bufferedOutputStream ->
+                        zipInputStream.copyTo(bufferedOutputStream)
+                    }
+                }
+            }
+            zipEntry = zipInputStream.nextEntry
+        }
+        zipInputStream.closeEntry()
+        zipInputStream.close()
+    } catch (e: Exception) {
+        e.printStackTrace()
     }
-    return byteArray
 }
 
 
@@ -115,4 +136,3 @@ fun DecodePreview() {
         DecodeScene(Modifier, decReceive = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888))
     }
 }
-
