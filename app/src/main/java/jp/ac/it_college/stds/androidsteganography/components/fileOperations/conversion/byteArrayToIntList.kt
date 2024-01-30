@@ -5,14 +5,10 @@ package jp.ac.it_college.stds.androidsteganography.components.fileOperations.con
  * byteArray : ByteArray? # 変換したいByteArrayを渡す
  */
 fun byteArrayToIntList(
-    byteArray: ByteArray?,
+    zipFile: ByteArray?,
 ): MutableList<Int> {
-    val bits = mutableListOf<Int>()
-    if (byteArray != null) {
-        for (byte in byteArray) {
-            val target = byte.toInt()
-            bits += target and 0x01
-        }
+    if (zipFile != null) {
+        return bitSetToList(byteArrayToBitSet(zipFile))
     }
-    return bits
+    return mutableListOf(-1)
 }
