@@ -2,6 +2,7 @@ package jp.ac.it_college.stds.androidsteganography.scene
 
 import android.content.ContentValues
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.os.Environment
 import android.provider.MediaStore
@@ -10,9 +11,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import jp.ac.it_college.stds.androidsteganography.ui.theme.AndroidSteganographyTheme
 import androidx.compose.ui.platform.LocalContext
+import jp.ac.it_college.stds.androidsteganography.components.common.SimpleLSB
 import jp.ac.it_college.stds.androidsteganography.components.common.readSteganography
 import kotlinx.coroutines.launch
 import java.io.BufferedOutputStream
@@ -36,6 +40,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
 
+lateinit var prefSetting: SharedPreferences
 
 @Composable
 fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, decReceive: Bitmap) {
@@ -47,6 +52,8 @@ fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, d
     var fileName: String by remember {
         mutableStateOf("")
     }
+    var text by remember { mutableStateOf("") }
+
 
     println("kara: $kara")
 
@@ -67,14 +74,23 @@ fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, d
                 )
             }
         }
+        Box(
+            contentAlignment = Alignment.TopCenter
+        ) {
+            OutlinedTextField(
+                value = text,
+                onValueChange = { text = it },
+                modifier = Modifier.padding(20.dp)
+            )
+        }
 
-        Button(onClick = { kara = decReceive.readSteganography(zipBitList) }) {
+        Button(onClick = { kara = decReceive.readSteganography(zipBitList, (SimpleLSB::read)) }) {
             Text(text = "読み込み")
         }
-        fileName = "example24.zip"
+//        fileName = "example24.zip"
         Button(onClick = {
             scope.launch {
-                saveAndExtractZip(context, kara!!, fileName, "extracted_files")
+                saveAndExtractZip(context, kara!!, "${text}.zip", "extracted_files")
             }
         }) {
             Text(text = "保存")
