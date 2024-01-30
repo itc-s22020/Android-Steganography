@@ -1,4 +1,4 @@
-package jp.ac.it_college.stds.androidsteganography.components.fileOperations.Conversion
+package jp.ac.it_college.stds.androidsteganography.components.fileOperations.conversion
 
 import java.util.BitSet
 
