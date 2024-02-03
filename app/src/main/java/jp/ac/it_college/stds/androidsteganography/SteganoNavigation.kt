@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -55,6 +56,7 @@ fun SteganoNavigation(
         )
     }
     var showText by remember { mutableStateOf(false) }
+    var selectNum by remember { mutableIntStateOf(0) }
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -93,23 +95,26 @@ fun SteganoNavigation(
                 composable(Destinations.START) {
                     titleText = "スタート画面"
                     StartScene(
-                        onEncryptClick = {
-                            bm = it
+                        onEncryptClick = { bitmap, intValue ->
+                            bm = bitmap
+                            selectNum = intValue
                             navController.navigate(Destinations.ENCRYPTION)
                         },
-                        onDecryptClick = {
-                            bm = it
+                        onDecryptClick = { bitmap, intValue ->
+                            bm = bitmap
+                            selectNum = intValue
                             navController.navigate(Destinations.DECRYPTION)
                         }
                     )
                 }
 
                 composable(Destinations.ENCRYPTION) {
-                    titleText = "暗号化画面"
+                    titleText = "暗号画面"
                     EncryptScene(
-                        receiveBm = bm,
-                        onEncryptResult = {
-                            bm = it
+                        bm = bm,
+                        encSelect = selectNum,
+                        onEncryptResult = {bitmap ->
+                            bm = bitmap
                             navController.navigate(Destinations.RESULT_ENC)
                         }
                     )
@@ -118,7 +123,7 @@ fun SteganoNavigation(
                 composable(Destinations.RESULT_ENC) {
                     titleText = "暗号化結果画面"
                     EncryptResultScene(
-                        receiveBm = bm,
+                        bm = bm,
                         onEndClick = { navController.navigate(Destinations.START) }
                     )
                 }
@@ -127,12 +132,12 @@ fun SteganoNavigation(
                     titleText = "復号化画面"
 
                     DecodeScene(
-                        decReceive = bm,
+                        bm = bm,
+                        decSelect = selectNum,
                         onDecodeClick = { navController.navigate(Destinations.START) }
                     )
                 }
             }
         }
     }
-
 }

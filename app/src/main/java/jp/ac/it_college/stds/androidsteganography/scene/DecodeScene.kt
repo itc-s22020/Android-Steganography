@@ -26,13 +26,13 @@ import coil.compose.rememberAsyncImagePainter
 import jp.ac.it_college.stds.androidsteganography.ui.theme.AndroidSteganographyTheme
 import androidx.compose.ui.platform.LocalContext
 import jp.ac.it_college.stds.androidsteganography.components.common.SimpleLSB
-import jp.ac.it_college.stds.androidsteganography.components.common.readSteganography
 import jp.ac.it_college.stds.androidsteganography.components.fileOperations.saveAndExtractZip
+import jp.ac.it_college.stds.androidsteganography.components.steganography.readSteganography
 
 import kotlinx.coroutines.launch
 
 @Composable
-fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, decReceive: Bitmap) {
+fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, bm: Bitmap, decSelect: Int) {
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -42,6 +42,8 @@ fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, d
     var bool: Boolean by remember {
         mutableStateOf(false)
     }
+
+
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -55,7 +57,7 @@ fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, d
             Box(modifier.fillMaxSize()) {
                 Image(
                     modifier = Modifier.align(Alignment.Center),
-                    painter = rememberAsyncImagePainter(decReceive),
+                    painter = rememberAsyncImagePainter(bm),
                     contentDescription = null
                 )
             }
@@ -69,9 +71,14 @@ fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, d
                 modifier = Modifier.padding(20.dp)
             )
         }
+        Text(text = "${decSelect}")
 
         Button(onClick = {
-            byteArray = decReceive.readSteganography(zipBitList, (SimpleLSB::read))
+            when (decSelect) {
+                0 -> byteArray = bm.readSteganography(SimpleLSB::read)
+                1 -> byteArray = bm.readSteganography(SimpleLSB::read)
+                2 -> byteArray = bm.readSteganography(SimpleLSB::read)
+            }
             bool = !bool
         }) {
             Text(text = "読み込み")
@@ -96,6 +103,6 @@ fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, d
 @Composable
 fun DecodePreview() {
     AndroidSteganographyTheme {
-        DecodeScene(Modifier, decReceive = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888))
+        DecodeScene(Modifier, bm = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888), decSelect = 0)
     }
 }
