@@ -79,4 +79,7 @@ dependencies {   //Compose 関連
 
     //Coil
     implementation("io.coil-kt:coil-compose:2.4.0")
+    
+    //qrCode
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 }
