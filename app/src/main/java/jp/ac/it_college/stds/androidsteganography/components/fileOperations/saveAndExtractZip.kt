@@ -12,7 +12,7 @@ import java.util.zip.ZipInputStream
 
 
 
-fun saveAndExtractZip(context: Context, byteArray: ByteArray, zipFileName: String, extractToDirName: String) {
+fun saveAndExtractZip(context: Context, byteArray: ByteArray, zipFileName: String, extractToDirName: String, unzipBool: Boolean) {
     try {
         val values = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, zipFileName)
@@ -28,27 +28,29 @@ fun saveAndExtractZip(context: Context, byteArray: ByteArray, zipFileName: Strin
             outputStream?.write(byteArray)
         }
 
+        if (unzipBool) {
+            val zipInputStream = ZipInputStream(byteArray.inputStream())
+            val downloadsDir =
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            val extractDir = File(downloadsDir, extractToDirName)
 
-        val zipInputStream = ZipInputStream(byteArray.inputStream())
-        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        val extractDir = File(downloadsDir, extractToDirName)
-
-        var zipEntry: ZipEntry? = zipInputStream.nextEntry
-        while (zipEntry != null) {
-            val file = File(extractDir, zipEntry.name)
-            if (zipEntry.isDirectory) {
-                file.mkdirs()
-            } else {
-                file.parentFile?.mkdirs()
-                FileOutputStream(file).use { fileOutputStream ->
-                    BufferedOutputStream(fileOutputStream).use { bufferedOutputStream ->
-                        zipInputStream.copyTo(bufferedOutputStream)
+            var zipEntry: ZipEntry? = zipInputStream.nextEntry
+            while (zipEntry != null) {
+                val file = File(extractDir, zipEntry.name)
+                if (zipEntry.isDirectory) {
+                    file.mkdirs()
+                } else {
+                    file.parentFile?.mkdirs()
+                    FileOutputStream(file).use { fileOutputStream ->
+                        BufferedOutputStream(fileOutputStream).use { bufferedOutputStream ->
+                            zipInputStream.copyTo(bufferedOutputStream)
+                        }
                     }
                 }
+                zipEntry = zipInputStream.nextEntry
             }
-            zipEntry = zipInputStream.nextEntry
+            zipInputStream.close()
         }
-        zipInputStream.close()
 
     } catch (e: Exception) {
         e.printStackTrace()

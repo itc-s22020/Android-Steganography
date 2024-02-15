@@ -25,8 +25,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import jp.ac.it_college.stds.androidsteganography.ui.theme.AndroidSteganographyTheme
 import androidx.compose.ui.platform.LocalContext
-import jp.ac.it_college.stds.androidsteganography.components.common.SimpleLSB
 import jp.ac.it_college.stds.androidsteganography.components.fileOperations.saveAndExtractZip
+import jp.ac.it_college.stds.androidsteganography.components.steganography.colorChanger.SimpleLSB
 import jp.ac.it_college.stds.androidsteganography.components.steganography.readSteganography
 
 import kotlinx.coroutines.launch
@@ -42,8 +42,7 @@ fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, b
     var bool: Boolean by remember {
         mutableStateOf(false)
     }
-
-
+    var unzipBool: Boolean by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -71,21 +70,20 @@ fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, b
                 modifier = Modifier.padding(20.dp)
             )
         }
-        Text(text = "${decSelect}")
 
         Button(onClick = {
-            when (decSelect) {
-                0 -> byteArray = bm.readSteganography(SimpleLSB::read)
-                1 -> byteArray = bm.readSteganography(SimpleLSB::read)
-                2 -> byteArray = bm.readSteganography(SimpleLSB::read)
-            }
+            byteArray = bm.readSteganography(SimpleLSB::read)
             bool = !bool
         }) {
             Text(text = "読み込み")
         }
+        Button(onClick = {unzipBool = !unzipBool}) {
+            Text(text = "解凍する？")
+
+        }
         Button(onClick = {
             scope.launch {
-                saveAndExtractZip(context, byteArray!!, "${text}.zip", "extracted_files")
+                saveAndExtractZip(context, byteArray!!, "${text}.zip", "${text}_files", unzipBool)
             }
         },
             enabled = bool
