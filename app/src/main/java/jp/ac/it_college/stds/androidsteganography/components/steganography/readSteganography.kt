@@ -1,6 +1,8 @@
 package jp.ac.it_college.stds.androidsteganography.components.steganography
 
 import android.graphics.Bitmap
+import jp.ac.it_college.stds.androidsteganography.components.fileOperations.conversion.bitSetToByteArray
+import jp.ac.it_college.stds.androidsteganography.components.fileOperations.conversion.listToBitSet
 
 /*
  * ステガノグラフィーの読み取りを行う関数名

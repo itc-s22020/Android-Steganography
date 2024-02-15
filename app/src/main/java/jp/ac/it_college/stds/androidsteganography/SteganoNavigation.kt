@@ -28,6 +28,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import jp.ac.it_college.stds.androidsteganography.components.desing.GradientTopAppBar
 import jp.ac.it_college.stds.androidsteganography.scene.DecodeScene
 import jp.ac.it_college.stds.androidsteganography.scene.EncryptResultScene
 import jp.ac.it_college.stds.androidsteganography.scene.EncryptScene
@@ -39,6 +40,7 @@ object Destinations {
     const val DECRYPTION = "decryption"
     const val RESULT_ENC = "result_enc"
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,6 +59,7 @@ fun SteganoNavigation(
     }
     var showText by remember { mutableStateOf(false) }
     var selectNum by remember { mutableIntStateOf(0) }
+    var zipList: MutableList<Int> = remember { mutableListOf<Int>().toMutableList() }
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -65,25 +68,11 @@ fun SteganoNavigation(
         modifier = Modifier.fillMaxSize(),
     ) {
         Scaffold(
-
             topBar = {
-                CenterAlignedTopAppBar(
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    ),
-                    title = { Text(text = titleText) },
-                    navigationIcon = {
-                        if (titleText != "スタート画面") {
-                            IconButton(onClick = { navController.popBackStack() }) {
-                                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                            }
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { showText = true }) {
-                            Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
-                        }
-                    }
+                GradientTopAppBar(
+                    titleText,
+                    navController = navController,
+                    titleText!="スタート画面"
                 )
             },
         ) {
@@ -113,8 +102,10 @@ fun SteganoNavigation(
                     EncryptScene(
                         bm = bm,
                         encSelect = selectNum,
-                        onEncryptResult = {bitmap ->
+                        onEncryptResult = {bitmap, intValue, mutableList ->
                             bm = bitmap
+                            selectNum = intValue
+                            zipList = mutableList
                             navController.navigate(Destinations.RESULT_ENC)
                         }
                     )
@@ -124,6 +115,8 @@ fun SteganoNavigation(
                     titleText = "暗号化結果画面"
                     EncryptResultScene(
                         bm = bm,
+                        encSelect = selectNum,
+                        zipBitList = zipList,
                         onEndClick = { navController.navigate(Destinations.START) }
                     )
                 }

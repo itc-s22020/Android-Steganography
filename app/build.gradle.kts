@@ -82,4 +82,7 @@ dependencies {   //Compose 関連
     
     //qrCode
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+
+    //camera
+    implementation("com.google.accompanist:accompanist-permissions:0.23.1")
 }

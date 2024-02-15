@@ -2,6 +2,7 @@ package jp.ac.it_college.stds.androidsteganography.components.common
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -16,6 +17,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import kotlin.math.min
+import kotlin.math.roundToInt
 
 /*
  * 画像選択可能なImageView
@@ -56,3 +59,4 @@ fun ImagePickerView(
         )
     }
 }
+
