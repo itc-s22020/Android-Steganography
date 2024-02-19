@@ -39,13 +39,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import jp.ac.it_college.stds.androidsteganography.components.common.FilePickerButton
-import jp.ac.it_college.stds.androidsteganography.components.common.ImagePickerView
 import jp.ac.it_college.stds.androidsteganography.components.desing.ColorProgressBar
 import jp.ac.it_college.stds.androidsteganography.components.fileOperations.saveBitmapAsPNG
-import jp.ac.it_college.stds.androidsteganography.components.steganography.colorChanger.QrCodeLSB
-import jp.ac.it_college.stds.androidsteganography.components.steganography.colorChanger.SimpleLSB
-import jp.ac.it_college.stds.androidsteganography.components.steganography.createSteganography
 import jp.ac.it_college.stds.androidsteganography.ui.theme.AndroidSteganographyTheme
 import jp.ac.it_college.stds.androidsteganography.ui.theme.mainGray
 import jp.ac.it_college.stds.androidsteganography.ui.theme.mainWhite
@@ -59,7 +54,7 @@ fun EncryptResultScene(
     zipBitList: MutableList<Int>
 ) {
     val context = LocalContext.current
-    var sBm: Bitmap by remember { mutableStateOf(bm) }
+    val sBm: Bitmap by remember { mutableStateOf(bm) }
     var bool: Boolean by remember { mutableStateOf(false) }
     var savePath by remember { mutableStateOf("Download") }
     var selectNum: Int by remember { mutableIntStateOf(0) }
@@ -84,9 +79,7 @@ fun EncryptResultScene(
                     .fillMaxWidth()
                     .height(360.dp)
             ) {
-                Column(
-
-                ) {
+                Column{
                     Text(
                         text = "詳細情報",
                         fontSize = 24.sp,
@@ -241,7 +234,7 @@ fun EncryptResultScene(
                                             .width(160.dp)
                                             .height(50.dp),
                                         onClick = {
-                                            saveBitmapAsPNG(bm = sBm, filePath = "/sdcard/${savePath}/${randomAlphabet(12)}.png" )
+                                            saveBitmapAsPNG(bm = bm, filePath = "/sdcard/${savePath}/${randomAlphabet(12)}.png" )
                                             Toast.makeText(context, "保存完了", Toast.LENGTH_SHORT).show()
                                         }) {
                                         Text(text = "保存")

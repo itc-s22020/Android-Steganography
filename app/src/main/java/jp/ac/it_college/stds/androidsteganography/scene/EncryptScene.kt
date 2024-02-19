@@ -40,7 +40,6 @@ import jp.ac.it_college.stds.androidsteganography.components.common.FilePickerBu
 import jp.ac.it_college.stds.androidsteganography.components.common.ImagePickerView
 import jp.ac.it_college.stds.androidsteganography.components.desing.ColorProgressBar
 import jp.ac.it_college.stds.androidsteganography.components.fileOperations.conversion.byteArrayToIntList
-import jp.ac.it_college.stds.androidsteganography.components.fileOperations.saveBitmapAsPNG
 import jp.ac.it_college.stds.androidsteganography.components.steganography.colorChanger.QrCodeLSB
 import jp.ac.it_college.stds.androidsteganography.components.steganography.colorChanger.SimpleLSB
 import jp.ac.it_college.stds.androidsteganography.components.steganography.createSteganography
@@ -53,11 +52,10 @@ fun EncryptScene(
     bm: Bitmap,
     encSelect: Int
 ) {
-//    var zipBitList: MutableList<Int> = remember { mutableListOf<Int>().toMutableList() }
     var zipBitList by remember { mutableStateOf(mutableListOf(0)) }
     val context = LocalContext.current
     var zipByte: ByteArray? by remember { mutableStateOf(null) }
-    var sBm: Bitmap by remember { mutableStateOf(bm)}
+    var sBm: Bitmap by remember { mutableStateOf(bm.copy(Bitmap.Config.ARGB_8888, true))}
     var text by remember { mutableStateOf("sample") }
 
     if(encSelect!=1) zipBitList = byteArrayToIntList(zipByte)
@@ -77,9 +75,7 @@ fun EncryptScene(
                 .fillMaxWidth()
                 .height(360.dp)
             ){
-                Column(
-
-                ) {
+                Column {
                     Text(text = "詳細情報",  fontSize = 24.sp, modifier = Modifier.padding(10.dp,0.dp,0.dp,0.dp))
                     Row{
                         Spacer(modifier = Modifier.width(35.dp))
@@ -226,7 +222,7 @@ fun EncryptScene(
                                                 .width(160.dp)
                                                 .height(50.dp),
                                             onClick = {
-                                                val bmHW = if(bm.width >= bm.height) bm.width else bm.height
+                                                val bmHW = if(bm.width >= bm.height) bm.height else bm.width
                                                 zipBitList = QrCodeLSB.generateQR(text,bmHW,bmHW,"H")
                                             }) {
                                             Text(text = "QRコード生成")
@@ -246,8 +242,8 @@ fun EncryptScene(
                                         enabled = zipBitList.size < sBm.width*sBm.height*3  && zipBitList.size > 10,
                                         onClick = {
                                             when (encSelect) {
-                                                0 -> sBm.createSteganography(zipBitList, (SimpleLSB::create))
-                                                1 -> sBm.createSteganography(zipBitList, (QrCodeLSB::create))
+                                                0 -> sBm = bm.createSteganography(zipBitList, (SimpleLSB::create))
+                                                1 -> sBm = bm.createSteganography(zipBitList, (QrCodeLSB::create))
                                             }
                                             onEncryptResult(sBm, encSelect, zipBitList)
                                         },

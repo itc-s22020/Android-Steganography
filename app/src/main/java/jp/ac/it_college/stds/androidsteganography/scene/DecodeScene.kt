@@ -1,6 +1,7 @@
 package jp.ac.it_college.stds.androidsteganography.scene
 
 import android.graphics.Bitmap
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,9 +53,6 @@ import jp.ac.it_college.stds.androidsteganography.ui.theme.mainWhite
 fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, bm: Bitmap, decSelect: Int) {
 
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    var zipBitList: MutableList<Int> = remember { mutableListOf<Int>().toMutableList() }
-    var byteArray: ByteArray? by remember { mutableStateOf(null) }
     var text by remember { mutableStateOf("") }
     val decodeBitmap by remember {
         mutableStateOf(
@@ -82,9 +79,7 @@ fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, b
                     .fillMaxWidth()
                     .height(360.dp)
             ) {
-                Column(
-
-                ) {
+                Column{
                     Text(
                         text = "詳細情報",
                         fontSize = 24.sp,
@@ -156,7 +151,7 @@ fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, b
                                 .width(60.dp)
                                 .height(60.dp)
                                 .background(
-                                    if (true) Color.Green else Color.Red,
+                                    Color.Green ,
                                     shape = RoundedCornerShape(200.dp)
                                 )
                         )
@@ -242,8 +237,9 @@ fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, b
                                                 0 -> saveAndExtractZip(context, decodeBitmap, "${text}.zip", "${text}_files")
                                                 1 -> saveByteArrayToFile(decodeBitmap,"${text}.png","/sdcard/Download")
                                             }
+                                            Toast.makeText(context, "保存完了", Toast.LENGTH_SHORT).show()
                                         },
-                                        enabled = text != "保存名",
+                                        enabled = text != "",
                                         colors = ButtonDefaults.buttonColors(
                                             contentColor = Color.White,
                                             disabledContainerColor = Color.Gray
