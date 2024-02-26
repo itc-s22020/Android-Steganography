@@ -67,11 +67,9 @@ object SimpleLSB{
 
                 for (color in pixelRGBs) {
                     if (end) {break}
-                    println(color)
                     val modColor = color % 3
                     if (modColor == 2) {
                         end = true
-                        println("break $pixelIndex")
                         break
                     }
                     steganographyBits.add(modColor)
