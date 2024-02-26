@@ -1,6 +1,7 @@
 package jp.ac.it_college.stds.androidsteganography.scene
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -54,6 +55,8 @@ fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, b
 
     val context = LocalContext.current
     var text by remember { mutableStateOf("") }
+    var qrBitmap by remember { mutableStateOf(Bitmap.createBitmap(10,10,Bitmap.Config.ARGB_8888)) }
+
     val decodeBitmap by remember {
         mutableStateOf(
             when (decSelect) {
@@ -65,6 +68,7 @@ fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, b
             }
         )
     }
+    if (decSelect == 1) { qrBitmap = BitmapFactory.decodeByteArray(decodeBitmap, 0, decodeBitmap.size) }
 
     Column {
         Box(
@@ -151,7 +155,7 @@ fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, b
                                 .width(60.dp)
                                 .height(60.dp)
                                 .background(
-                                    Color.Green ,
+                                    Color.Green,
                                     shape = RoundedCornerShape(200.dp)
                                 )
                         )
@@ -300,7 +304,7 @@ fun DecodeScene(modifier: Modifier = Modifier, onDecodeClick: () -> Unit = {}, b
                 Box(modifier.fillMaxSize()) {
                     Text(text = "画像選択", modifier.align(Alignment.Center), fontSize = 24.sp)
                     Image(
-                        bitmap = bm.asImageBitmap(),
+                        bitmap = if (decSelect != 1) {bm.asImageBitmap()} else {qrBitmap.asImageBitmap()},
                         contentDescription = "",
                         modifier = Modifier.align(Alignment.Center)
                     )
